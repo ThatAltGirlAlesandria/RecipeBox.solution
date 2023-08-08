@@ -11,7 +11,7 @@ namespace RecipeBox.Controllers
   {
     private readonly RecipeBoxContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly SingInManager<ApplicationUser> _signInManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
 
     public AccountController (UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, RecipeBoxContext db)
     {
