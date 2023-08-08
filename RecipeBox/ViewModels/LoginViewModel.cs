@@ -1,4 +1,8 @@
-using System.ComponentModel.DataAnnotation;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace RecipeBox.ViewModels
 {
@@ -6,7 +10,7 @@ namespace RecipeBox.ViewModels
   {
     [Required]
     [EmailAddress]
-    [Display(nameof = "Email Address")]
+    [Display(Name = "Email Address")]
     public string Email { get; set; }
 
     [Required]

@@ -11,17 +11,24 @@ using System.Security.Claims;
 
 namespace RecipeBox.Controllers
 {
+  [Authorize]
   public class TagsController : Controller
   {
     private readonly RecipeBoxContext _db;
-
-    public TagsController(RecipeBoxContext db)
+    private readonly UserManager<ApplicationUser> _userManager;
+    public TagsController(UserManager<ApplicationUser> userManager, RecipeBoxContext db)
     {
+      _userManager = userManager;
       _db = db;
     }
-    public ActionResult Index()
+    public async Task<ActionResult> Index()
     {
-      return View(_db.Tags.ToList());
+      string userId = userId.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      ApplicationUser currentUser = await _userManager.FindByIdAsync(userId);
+      List<Tag> userTags = _db.Tags
+        .Where(entry => entry.User.Id == currentUser.Id)
+        .ToList();
+      return View(userTags);
     }
 
     public ActionResult Details(int id)
@@ -36,21 +43,36 @@ namespace RecipeBox.Controllers
     {
       return View();
     }
-    
-
+  
     
     [HttpPost]
-    public ActionResult Create(Tag tag)
+    public async Task<ActionResult> Create(Tag tag)
     {
-      _db.Tags.Add(tag);
-      _db.SaveChanges();
-      return RedirectToAction("Index");
+      if (!ModelState.IsValid)
+      {
+        return View(tag);
+      }
+      else
+      {
+        string userId = userId.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        ApplicationUser currentUser = await _userManager.FindByIdAsync(userId);
+        tag.User = currentUser;
+        _db.Tags.Add(tag);
+        _db.SaveChanges();
+        return RedirectToAction("Index");
+      }
     }
 
-    public ActionResult AddRecipe(Tag tag, int recipeId)
+    public async Task<ActionResult> AddRecipe(int id)
     {
-      Tag thisTag = _db.Tags.FirstOrDefault(tag => tag.TagId == id);
-      ViewBag.RecipeId = new SelectList(_db.Recipes, "RecipeId", "Ingredients");
+      string userId = userId.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+      ApplicationUser currentUser = await _userManager.FindByIdAsync(userId);
+      List<Recipe> userRecipes = _db.Recipes
+        .Where(entry => entry.User.Id == currentUser.Id)
+        .Include(tag => tag.JoinEntities)
+        .ToList();
+      Tag thisTag = _db.Tags.FirstOrDefault(tags => tags.TagId == id);
+      ViewBag.RecipeId = new SelectList(_db.Recipes, "RecipeId", "Title");
       return View(thisTag);
     }
 
@@ -59,6 +81,7 @@ namespace RecipeBox.Controllers
     {
       #nullable enable
       RecipeTag? joinEntity = _db.RecipeTags.FirstOrDefault(join => (join.RecipeId == recipeId && joinTagId == tag.TagId));
+      #nullable disable
       if (joinEntity = null && recipeId != 0)
         {
         _db.ItemTags.Add(new RecipeTag() { RecipeId = recipeId, TagId = tag.TagId });

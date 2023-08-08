@@ -1,4 +1,8 @@
-using System.ComponentModel.DataAnnotation;
+using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace RecipeBox.ViewModels
 {
@@ -16,7 +20,7 @@ namespace RecipeBox.ViewModels
 
     [Required]
     [DataType(DataType.Password)]
-    [Display(nameof = "Confirm Password")]
+    [Display(Name = "Confirm Password")]
     [Compare("Password", ErrorMessage = "The passwords you entered don't match. Please try again.")]
     public string ConfirmPassword { get; set; }
   }

@@ -17,7 +17,7 @@ namespace RecipeBox.Controllers
   {
     private readonly RecipeBoxContext _db;
     private readonly UserManager<ApplicationUser> _userManager;
-    public RecipesController(UserManager<Application> userManager, RecipeBoxContext db)
+    public RecipesController(UserManager<ApplicationUser> userManager, RecipeBoxContext db)
     {
       _userManager = userManager;
       _db = db;
